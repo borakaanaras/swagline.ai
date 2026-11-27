@@ -143,6 +143,7 @@ Planlanan feature'lar: `body-photo` ✅, `outfit` (ürün seçme/kombin), `try-o
 |---|---|---|---|
 | `expo-router` (+ `react-native-screens`, `react-native-safe-area-context`, `expo-linking`, `expo-constants`) | Expo'nun önerdiği dosya tabanlı navigasyon; diğerleri onun zorunlu eş bağımlılıkları. | ✅ | Adım 1 |
 | `expo-image-picker` | Kamera ile çekme ve galeriden seçme, izin yönetimi dahil. Resmi Expo modülü. | ✅ | Adım 1 |
+| `react-dom` (19.3.0, `react` ile aynı sürüme sabit) | `expo-router`'ın web bağımlılıkları react-dom'u peer olarak istiyor; eklenmezse npm en yeni react-dom'u (19.3.1) seçip temiz klonda `npm install`'ı ERESOLVE ile düşürüyor. Ayrıca web önizlemesine zemin. `react` güncellenirse `npx expo install react-dom` ile birlikte güncellenmeli. | ✅ | Adım 1 düzeltmesi |
 
 ## 8. Çalışma akışı (her adımda)
 
