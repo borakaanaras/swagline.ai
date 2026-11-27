@@ -1,15 +1,20 @@
 import { Linking, StyleSheet, Text, View } from 'react-native';
 
-import { Button } from '@/components/ui';
+import { Button } from './Button';
 import { colors, radius, spacing, typography } from '@/theme';
-import type { BodyPhotoError as BodyPhotoErrorType } from '../hooks/useBodyPhotoPicker';
+import type { ImageSource } from '@/types/image';
+
+/** Kamera/galeri akışlarında UI'a gösterilen hata durumu. */
+export type ImagePickerErrorState =
+  | { kind: 'permission-denied'; source: ImageSource; canAskAgain: boolean }
+  | { kind: 'unknown'; message: string };
 
 type Props = {
-  error: BodyPhotoErrorType;
+  error: ImagePickerErrorState;
   onRetry: () => void;
 };
 
-function messageFor(error: BodyPhotoErrorType): string {
+function messageFor(error: ImagePickerErrorState): string {
   if (error.kind === 'unknown') {
     return 'Fotoğraf alınırken bir sorun oluştu. Lütfen tekrar dene.';
   }
@@ -19,7 +24,7 @@ function messageFor(error: BodyPhotoErrorType): string {
     : `${target[0].toUpperCase()}${target.slice(1)} erişim izni kapalı. Ayarlar'dan SwaglineAI için izni açabilirsin.`;
 }
 
-export function BodyPhotoError({ error, onRetry }: Props) {
+export function ImagePickerError({ error, onRetry }: Props) {
   const showSettings = error.kind === 'permission-denied' && !error.canAskAgain;
 
   return (

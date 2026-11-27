@@ -31,7 +31,18 @@
           "photosPermission": "SwaglineAI, kıyafetleri üzerinde deneyebilmen için galerinden fotoğraf seçmene izin ister.",
           "cameraPermission": "SwaglineAI, tam boy fotoğrafını çekebilmen için kameraya erişmek ister."
         }
-      ]
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "SwaglineAI, kıyafetleri üzerinde deneyebilmen için galerinden fotoğraf seçmene izin ister.",
+          "savePhotosPermission": "SwaglineAI, deneme sonuçlarını Fotoğraflar'a kaydedebilmek için izin ister.",
+          "granularPermissions": [
+            "photo"
+          ]
+        }
+      ],
+      "expo-font"
     ],
     "scheme": "swaglineai"
   }

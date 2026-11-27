@@ -1,8 +1,8 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 
-import { colors, radius, spacing } from '@/theme';
+import { colors, fonts, radius, spacing } from '@/theme';
 
-type Variant = 'primary' | 'secondary';
+type Variant = 'primary' | 'secondary' | 'ghost';
 
 type Props = {
   title: string;
@@ -13,6 +13,7 @@ type Props = {
   accessibilityHint?: string;
 };
 
+/** Hap biçimli buton. `primary` = indigo aksiyon, `secondary` = çerçeveli, `ghost` = yalnızca metin. */
 export function Button({
   title,
   onPress,
@@ -33,7 +34,7 @@ export function Button({
       disabled={isDisabled}
       style={({ pressed }) => [
         styles.base,
-        isPrimary ? styles.primary : styles.secondary,
+        styles[variant],
         pressed && !isDisabled && styles.pressed,
         isDisabled && styles.disabled,
       ]}
@@ -41,9 +42,7 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={isPrimary ? colors.primaryText : colors.text} />
       ) : (
-        <Text style={[styles.label, isPrimary ? styles.primaryLabel : styles.secondaryLabel]}>
-          {title}
-        </Text>
+        <Text style={[styles.label, isPrimary ? styles.primaryLabel : styles.secondaryLabel]}>{title}</Text>
       )}
     </Pressable>
   );
@@ -51,21 +50,18 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 52,
-    borderRadius: radius.md,
+    minHeight: 54,
+    borderRadius: radius.pill,
     paddingHorizontal: spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   primary: { backgroundColor: colors.primary },
-  secondary: {
-    backgroundColor: colors.surfaceAlt,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  pressed: { opacity: 0.85 },
-  disabled: { opacity: 0.45 },
-  label: { fontSize: 16, fontWeight: '600' },
+  secondary: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.frame },
+  ghost: { backgroundColor: 'transparent', minHeight: 44 },
+  pressed: { opacity: 0.8, transform: [{ scale: 0.98 }] },
+  disabled: { opacity: 0.4 },
+  label: { fontFamily: fonts.semibold, fontSize: 16, letterSpacing: -0.1 },
   primaryLabel: { color: colors.primaryText },
   secondaryLabel: { color: colors.text },
 });

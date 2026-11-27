@@ -1,12 +1,11 @@
 import { useCallback, useState } from 'react';
 
+import type { ImagePickerErrorState } from '@/components/ui';
 import { pickImage } from '@/services/media/imagePickerService';
 import { useTryOnSession } from '@/store/TryOnSessionContext';
 import type { ImageSource } from '@/types/image';
 
-export type BodyPhotoError =
-  | { kind: 'permission-denied'; source: ImageSource; canAskAgain: boolean }
-  | { kind: 'unknown'; message: string };
+export type BodyPhotoError = ImagePickerErrorState;
 
 /**
  * Boy fotoğrafı seçme/çekme akışını yöneten hook.

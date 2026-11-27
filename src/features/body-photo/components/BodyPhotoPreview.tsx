@@ -1,54 +1,37 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius, spacing, typography } from '@/theme';
+import { Mirror } from '@/components/ui';
+import { spacing, typography } from '@/theme';
 import type { LocalImage } from '@/types/image';
+import { ShootingGuide } from './ShootingGuide';
 
 type Props = {
   photo: LocalImage | null;
 };
 
-/** Seçilen boy fotoğrafını 3:4 dikey çerçevede gösterir; yoksa kadraj silüeti gösterir. */
+/** Fotoğraf kabin aynasının içinde; yoksa aynada ürüne göre kadraj rehberi. */
 export function BodyPhotoPreview({ photo }: Props) {
   return (
-    <View style={styles.frame}>
+    <Mirror style={styles.mirror}>
       {photo ? (
         <Image
           source={{ uri: photo.uri }}
           style={styles.image}
           resizeMode="contain"
-          accessibilityLabel="Seçilen tam boy fotoğraf"
+          accessibilityLabel="Seçilen fotoğrafın"
         />
       ) : (
         <View style={styles.empty}>
-          <View style={styles.guide} />
-          <Text style={[typography.caption, styles.emptyText]}>
-            Henüz fotoğraf yok. Tam boy fotoğrafını çek ya da galeriden seç.
-          </Text>
+          <Text style={typography.subtitle}>Ne deneyeceksin?</Text>
+          <ShootingGuide />
         </View>
       )}
-    </View>
+    </Mirror>
   );
 }
 
 const styles = StyleSheet.create({
-  frame: {
-    width: '100%',
-    aspectRatio: 3 / 4,
-    borderRadius: radius.lg,
-    overflow: 'hidden',
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+  mirror: { flex: 1 },
   image: { width: '100%', height: '100%' },
-  empty: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg, gap: spacing.md },
-  guide: {
-    width: '38%',
-    height: '70%',
-    borderRadius: 999,
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: colors.textMuted,
-  },
-  emptyText: { textAlign: 'center' },
+  empty: { flex: 1, justifyContent: 'flex-end', padding: spacing.lg, gap: spacing.sm },
 });

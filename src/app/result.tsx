@@ -1,6 +1,3 @@
-import { PlaceholderScreen } from '@/components/ui';
+import { ResultScreen } from '@/features/result';
 
-// TODO.md Adım 8'de gerçek ekranla değiştirilecek.
-export default function ResultRoute() {
-  return <PlaceholderScreen title="Sonuç" description="Sonuç ekranı henüz hazır değil." />;
-}
+export default ResultScreen;
