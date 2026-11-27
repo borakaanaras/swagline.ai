@@ -29,12 +29,17 @@
 - Domain tipleri `src/types/` altındadır. Servisler 3. parti tipleri bu tiplere dönüştürür.
 - Geliştirme boyunca `tryOn` servisi **mock**'tur; Firebase yokken de uçtan uca akış çalışır.
 
-### Mevcut dosyalar (Adım 1)
+### Mevcut dosyalar (Adım 1, 5)
 
 | Dosya | Sorumluluk |
 |---|---|
 | `src/services/media/imagePickerService.ts` | İzin kontrol/isteme, kamera/galeri açma, sonucu `PickImageResult`'a çevirme |
-| `src/store/TryOnSessionContext.tsx` | `bodyPhoto` durumu (`setBodyPhoto`, `clearBodyPhoto`, `reset`) |
+| `src/store/TryOnSessionContext.tsx` | Oturum durumu: `bodyPhoto`, `garments`, `outfit` (ekle/sil/kombine al-çıkar/arka plan tercihi, `reset`) |
+| `src/store/outfitRules.ts` | Saf kombin kuralları: `applyGarmentToOutfit`, `removeGarmentFromOutfit`, `isGarmentInOutfit` |
+| `src/types/garment.ts` | `GarmentSlot`, `Garment`, `Outfit`, `GARMENT_SLOT_ORDER`, `MAX_GARMENTS` |
+| `src/features/outfit/hooks/useOutfitBuilder.ts` | Ürün fotoğrafı alma → yuva seçtirme → havuza ekleme; kural bilgi notları |
+| `src/features/outfit/screens/OutfitScreen.tsx` | Kombin ekranı (havuz ızgarası, yuva seçici alt sayfa, kombin çubuğu) |
+| `src/features/outfit/garmentSlots.ts` | Yuvaların Türkçe adları/örnekleri (public API'den diğer feature'lara açık) |
 | `src/features/body-photo/hooks/useBodyPhotoPicker.ts` | Servis sonucunu oturuma yazar, `loadingSource` / `error` üretir |
 | `src/features/body-photo/screens/BodyPhotoScreen.tsx` | Ekran düzeni |
 | `src/config/env.ts` | Herkese açık ortam değerleri: mock seçimi, paywall bayrağı |
@@ -56,13 +61,13 @@ type Outfit = Partial<Record<GarmentSlot, string>>;   // yuva → garment id
 
 type TryOnSessionState = {
   bodyPhoto: LocalImage | null;     // ✅ Adım 1
-  garments: Garment[];              // ⏳ Adım 5 (en fazla 10)
-  outfit: Outfit;                   // ⏳ Adım 5
+  garments: Garment[];              // ✅ Adım 5 (en fazla 10)
+  outfit: Outfit;                   // ✅ Adım 5
   activeJob: { jobId: string } | null;            // ⏳ Adım 8
 };
 ```
 
-**Kombin kuralları** (saf fonksiyon `applyGarmentToOutfit(outfit, garment)`, birim testli):
+**Kombin kuralları** (saf fonksiyon `applyGarmentToOutfit(outfit, garment) → { outfit, removedSlots }`, `src/store/outfitRules.ts`; birim testi Adım 2'de):
 - Her yuvada en fazla 1 ürün; aynı yuvaya yeni ürün eskisinin yerine geçer.
 - `dress` seçilince `top` ve `bottom` çıkarılır; `top` veya `bottom` seçilince `dress` çıkarılır.
 
