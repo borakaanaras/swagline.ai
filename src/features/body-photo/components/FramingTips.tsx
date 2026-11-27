@@ -33,6 +33,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   row: { flexDirection: 'row', gap: spacing.sm },
-  bullet: { color: colors.primary, fontSize: 15, lineHeight: 21 },
+  bullet: { color: colors.accent, fontSize: 15, lineHeight: 21 },
   tip: { flex: 1, lineHeight: 21 },
 });

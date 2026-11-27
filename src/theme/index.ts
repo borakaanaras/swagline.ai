@@ -1,13 +1,26 @@
+/**
+ * Marka paleti (bkz. CLAUDE.md §2 "Tasarım"). Yeni renk eklemeden önce buradakileri kullan.
+ */
 export const colors = {
-  background: '#0E0E10',
-  surface: '#1A1A1F',
-  surfaceAlt: '#24242B',
-  border: '#2E2E36',
-  text: '#F5F5F7',
-  textMuted: '#A1A1AA',
-  primary: '#E8FF59',
-  primaryText: '#0E0E10',
-  danger: '#FF5C5C',
+  /** Arka plan — Dark Neutral (derin siyah/kömür) */
+  background: '#0F0F12',
+  /** Kartlar / yüzeyler — koyu kül grisi */
+  surface: '#1C1C24',
+  /** Yüzey üstü ikincil alan (surface'ın bir ton açığı) */
+  surfaceAlt: '#262631',
+  border: '#2E2E3A',
+  /** Birincil metin — buz beyazı */
+  text: '#F8FAFC',
+  /** İkincil metin — sönük gri */
+  textMuted: '#94A3B8',
+  /** CTA / birincil aksiyon — Electric Indigo */
+  primary: '#6366F1',
+  primaryText: '#F8FAFC',
+  /** AI etkileşimi vurgusu (işleniyor, AI rozetleri) — Cyber Cyan */
+  accent: '#22D3EE',
+  accentText: '#0F0F12',
+  danger: '#F87171',
+  dangerSurface: 'rgba(248, 113, 113, 0.12)',
 } as const;
 
 export const spacing = {

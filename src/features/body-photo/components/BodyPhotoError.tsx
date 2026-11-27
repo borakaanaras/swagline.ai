@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: spacing.md,
     gap: spacing.sm,
-    backgroundColor: 'rgba(255, 92, 92, 0.12)',
+    backgroundColor: colors.dangerSurface,
     borderWidth: 1,
     borderColor: colors.danger,
   },

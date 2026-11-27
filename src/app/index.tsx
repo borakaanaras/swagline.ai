@@ -25,7 +25,7 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background, padding: spacing.lg },
   hero: { flex: 1, justifyContent: 'center', gap: spacing.md },
-  brand: { color: colors.primary, fontSize: 16, fontWeight: '700', letterSpacing: 2 },
+  brand: { color: colors.accent, fontSize: 16, fontWeight: '700', letterSpacing: 2 },
   muted: { opacity: 0.75, lineHeight: 22 },
   footer: { paddingBottom: spacing.md },
 });
