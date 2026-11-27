@@ -1,7 +1,6 @@
 # SPEC.md — Ürün Akışı ve Ekranlar
 
 > Durum etiketleri: ✅ uygulandı · 🚧 iskelet var · ⏳ planlandı. Adım numaraları `TODO.md` ile eşleşir.
-> Ürün kararlarının özeti `CLAUDE.md` §1'de.
 
 ## 0. Genel akış
 
@@ -21,7 +20,7 @@ Karşılama ─► (Giriş: Apple / Google) ─► (1) Boy fotoğrafı ─► (2
 
 ## Karşılama ✅ (`/`)
 
-- Marka adı, kısa açıklama, **Başla** butonu.
+- Marka adı, boş kabin aynası (açılışta tek bir cyan tarama), "Almadan önce üzerinde gör." başlığı, tek cümle açıklama, **Kabine gir** butonu.
 - ⏳ Adım 16 sonrası: giriş yapılmamışsa *Apple ile devam et* / *Google ile devam et*. Giriş yapılmışsa doğrudan boy fotoğrafına
   (kayıtlı boy fotoğrafı varsa Kombin ekranına).
 
@@ -32,20 +31,21 @@ Karşılama ─► (Giriş: Apple / Google) ─► (1) Boy fotoğrafı ─► (2
 - Geliştirme sırasında (`EXPO_PUBLIC_PAYWALL_ENABLED=false`) giriş atlanabilir.
 - Hesabı silme seçeneği (Ayarlar), App Store zorunluluğu.
 
-## (1) Boy fotoğrafı çekme/seçme ✅ (`/capture/body`)
+## (1) Kullanıcı fotoğrafı çekme/seçme ✅ (`/capture/body`)
 
-**Amaç:** AI'ın iyi sonuç verebileceği, baştan ayağa, net bir fotoğraf almak.
+**Amaç:** Denenecek ürüne uygun kadrajda net bir fotoğraf almak. Tam boy zorunlu değil.
 
-- **Önizleme alanı (3:4 dikey):** Fotoğraf yoksa kesikli silüet kılavuzu + "Henüz fotoğraf yok". Varsa tamamı (`contain`).
-- **Butonlar:** *Fotoğraf çek* / *Yeniden çek* (kamera), *Galeriden seç*, *Devam et* (yalnızca fotoğraf varsa aktif).
-- **Kadraj ipuçları:** baştan ayağa kadraj; telefon bel hizasında ve dik; sade arka plan; önden, kollar hafif açık;
-  bol ışık, arkadan ışıktan kaçın; vücut hatlarını gösteren ince kıyafetler. ⏳ Ayakkabı denemek için ayaklar, gözlük için yüz net görünmeli.
+- **Tek ekran, kaydırma yok.** Başlık + kalan alanı dolduran önizleme + alta sabit butonlar.
+- **Önizleme:** Fotoğraf yoksa "Ne deneyeceksin?" rehberi: 👗 kombin/alt/elbise/ayakkabı → *Boydan çek*,
+  👕 üst/ceket → *Belden yukarısı yeter*, 🕶️ gözlük/şapka/takı → *Yüzün net görünsün*. Varsa tamamı (`contain`).
+- **"Nasıl çekmeliyim?"** (başlığın sağında): aynı rehber + genel ipuçları (önden, dik, sade arka plan, bol ışık, bölge kapanmasın).
+- **Butonlar (alt):** *Fotoğraf çek* / *Yeniden çek*, *Galeriden seç*; fotoğraf seçilince *Devam et* belirir.
 - **İzinler:** Reddedilirse açıklama + *Tekrar dene*; kalıcı reddedildiyse *Ayarları aç*.
 - **Vazgeçme:** Picker kapatılırsa mevcut fotoğraf korunur, hata gösterilmez.
-- ⏳ **Doğrulama (Adım 3):** Yatay veya kısa kenarı 512 px'ten küçükse engellemeyen uyarı.
+- ⏳ **Doğrulama (Adım 3):** Kısa kenarı 512 px'ten küçükse engellemeyen uyarı.
 - ⏳ İleride: canlı kamera üzerinde kadraj overlay'i.
 
-## (2) Kombin oluşturma — ürün fotoğrafı seçme ⏳ (`/capture/garment`, Adım 5) — şu an yer tutucu
+## (2) Kombin oluşturma — ürün fotoğrafı seçme ✅ (`/capture/garment`, Adım 5)
 
 **Ürün yuvaları (kategori):**
 
@@ -59,17 +59,20 @@ Karşılama ─► (Giriş: Apple / Google) ─► (1) Boy fotoğrafı ─► (2
 | `eyewear` (Gözlük) | gözlük, güneş gözlüğü | |
 | `accessory` (Aksesuar) | çanta, şapka, takı, saat | Kombinde en fazla 1 aksesuar (ilk sürüm) |
 
-**Ekran:**
+**Ekran (sade, az metin):**
 - Üstte boy fotoğrafı küçük resmi + *Değiştir*.
-- *Ürün ekle*: galeriden seç veya kamerayla çek. Eklenince:
+- Izgaradaki *+ Ürün ekle* kutucuğu (havuz boşken tam genişlik) → *Fotoğraf çek* / *Galeriden seç* seçimi. Eklenince:
   1. Arka plan **otomatik temizlenecek** şekilde işaretlenir (temizleme deneme sırasında sunucuda yapılır, bkz. ARCHITECTURE §4).
-     Kartta "Arka plan temizlenecek" rozeti; kullanıcı isterse *Orijinali kullan* ile kapatır.
-  2. Kategori sorulur (yuva seçici). İleride otomatik tahmin, kullanıcı düzeltebilir.
-- **Ürün havuzu:** ızgara; her kart küçük resim, kategori etiketi, sil (×). En fazla 10 ürün.
+     Kartta "✦ Arka plan silinecek" rozeti; rozete dokununca "Orijinal" olur (ve geri).
+  2. Kategori sorulur (alttan açılan yuva seçici). *Vazgeç* derse ürün eklenmez. İleride otomatik tahmin.
+  3. Eklenen ürün doğrudan kombine girer (kurallar uygulanır).
+- **Ürün havuzu:** 2 sütunlu ızgara; her kart küçük resim, kategori etiketi (dokununca kategori değiştirilir), sil (×),
+  seçiliyse indigo çerçeve + ✓. En fazla 10 ürün; dolunca *+ Ürün ekle* kutucuğu gizlenir.
 - **Kombin çubuğu (alt):** seçili ürünler yuva sırasıyla. Bir karta dokunmak onu kombine ekler/çıkarır.
-  Aynı yuvada başka ürün seçilirse eskisinin yerine geçer; `dress` seçilince `top`/`bottom` çıkar (kısa bilgi notu).
-- *Üzerimde dene* (en az 1 ürün seçiliyse aktif) → hak kontrolü → İşleniyor.
-- Ürün fotoğrafı ipuçları: ürün tek başına, tamamı görünür, net; askıda veya düz zeminde.
+  Aynı yuvada başka ürün seçilirse eskisinin yerine geçer; `dress` seçilince `top`/`bottom` çıkar (cyan bilgi notu, ~3,5 sn).
+- *Üzerimde dene* (boy fotoğrafı var ve en az 1 ürün seçiliyse aktif) → hak kontrolü (⏳) → İşleniyor.
+- *Değiştir* boy fotoğrafı ekranına döner; ürün havuzu ve kombin korunur.
+- Kamera/galeri izin hataları boy fotoğrafı ekranıyla aynı ortak bileşenle gösterilir.
 
 ## Hak kontrolü ve Paywall ⏳ (Adım 17)
 
@@ -79,25 +82,32 @@ Karşılama ─► (Giriş: Apple / Google) ─► (1) Boy fotoğrafı ─► (2
 - **Geliştirmede kapalı:** `EXPO_PUBLIC_PAYWALL_ENABLED=false` ve backend'de `PAYWALL_ENABLED=false` iken sınırsız deneme.
 - Fiyatlandırma modeli (kredi paketi / abonelik) henüz belirlenmedi.
 
-## (3) Yükleniyor / işleniyor ekranı ⏳ (`/processing`, Adım 8) — şu an yer tutucu
+## (3) Yükleniyor / işleniyor ekranı ✅ (`/processing`, Adım 8)
 
 - Geri hareketi kapalı; *İptal et* (onay sonrası Kombin ekranına döner, iş iptal edilir, hak düşmez).
-- Aşamalar (`accent` renginde AI animasyonu):
+- Tek ekran: kullanıcının fotoğrafı kabin aynasında karartılmış, üzerinde sürekli cyan tarama çizgisi; altında aşama başlığı, cyan adım (2 / 3), ince ilerleme çubuğu, süre metni; altta *İptal et*.
+- Aşamalar:
   1. *Fotoğraflar hazırlanıyor* (sıkıştırma)
   2. *Yükleniyor*
-  3. *Arka planlar temizleniyor*
-  4. *Giydiriliyor: Üst (1/3)* — çoklu parça sırayla giydirilir, her parça için alt aşama gösterilir
+  3. *Sıraya alındı*
+  4. *Arka planlar temizleniyor*
+  5. *Giydiriliyor: Üst* + "1 / 3" — çoklu parça sırayla giydirilir
 - Beklenen süre metni (parça sayısına göre: "Yaklaşık 20–60 sn").
 - 30 sn × parça sayısı aşılırsa "Biraz uzun sürüyor, bekliyoruz…". Zaman aşımı → Hata.
+- **Hata görünümü** aynı ekranda: başlık + tek cümle + birincil aksiyon (*Tekrar dene* / *Boy fotoğrafını değiştir* /
+  *Kombini değiştir*) ve *Kombine dön*. Android geri tuşu iş sürerken iptal onayı açar.
 - Uygulama arka plana atılıp dönülürse polling kaldığı yerden devam eder.
 
-## (4) Sonuç ekranı ⏳ (`/result`, Adım 9–10) — şu an yer tutucu
+## (4) Sonuç ekranı ✅ Adım 9 · ⏳ Adım 10 (`/result`)
 
-- Giydirilmiş görsel tam ekran (yakınlaştırılabilir). *Önce / Sonra* (basılı tutunca orijinal).
-- Kombindeki ürünlerin küçük resimleri altta.
-- Aksiyonlar: **Kaydet** (galeriye), **Paylaş**, **Favorilere ekle** (♥), **Tekrar dene**, **Kombini değiştir**.
+- Tek ekran: giydirilmiş görsel kalan alanı doldurur (iOS'ta iki parmakla yakınlaştırma), üstünde *Önce / Sonra* anahtarı.
+- Kombindeki ürünlerin küçük resimleri altta; kısmi sonuçta "X giydirilemedi" (kırmızı).
+- Sonuç görselinin sol altında yarı saydam **SwaglineAI** filigranı (✦ + yazı; gerçek logo gelince değişecek). *Önce* görünümünde yok.
+- Aksiyonlar: ✅ **Görseli indir** (logolu, uzun kenar ≤ 1536 px JPEG → Fotoğraflar; başarıda "Kaydedildi ✓"),
+  ✅ **Kombini değiştir**, ✅ **Tekrar dene**; ⏳ **Paylaş** (Adım 10), **Favorilere ekle** (♥, Adım 11).
+- Mock ile üretilen sonuçta "Demo · AI henüz bağlı değil" rozeti.
 - Her başarılı sonuç otomatik olarak cihazdaki **Geçmiş**'e eklenir.
-- Not: "Sonuç AI tarafından üretilmiştir; gerçek beden/kalıp farklı olabilir."
+- Not: "AI tarafından üretildi; gerçek beden ve kalıp farklı olabilir."
 
 ## Geçmiş ve Favoriler ⏳ (`/history`, Adım 11)
 
@@ -112,24 +122,24 @@ Her hata **kullanıcı dostu Türkçe mesaj + net bir sonraki aksiyon** içerir.
 
 | Durum | Nerede | Mesaj / Aksiyon | Durum |
 |---|---|---|---|
-| Kamera/galeri izni reddedildi | Boy, Kombin | Açıklama + *Tekrar dene* | ✅ (Boy) |
-| İzin kalıcı reddedildi | Boy, Kombin | *Ayarları aç* | ✅ (Boy) |
-| Picker hatası | Boy, Kombin | "Fotoğraf alınırken bir sorun oluştu" + *Tekrar dene* | ✅ (Boy) |
+| Kamera/galeri izni reddedildi | Boy, Kombin | Açıklama + *Tekrar dene* | ✅ |
+| İzin kalıcı reddedildi | Boy, Kombin | *Ayarları aç* | ✅ |
+| Picker hatası | Boy, Kombin | "Fotoğraf alınırken bir sorun oluştu" + *Tekrar dene* | ✅ |
 | Uygun olmayan boy fotoğrafı | Boy | Uyarı, engellemez | ⏳ |
 | Arka plan temizlenemedi | Kombin / İşleniyor | "Ürünün arka planını ayıramadık" + *Orijinali kullan* / *Başka fotoğraf* | ⏳ |
-| Görsel hazırlanamadı | İşleniyor | "Fotoğraf hazırlanamadı" + *Başka fotoğraf seç* | ⏳ |
-| İnternet yok | İşleniyor | "İnternet bağlantını kontrol et" + *Tekrar dene* | ⏳ |
-| Sunucu hatası | İşleniyor | "Şu an bağlanamıyoruz" + *Tekrar dene* | ⏳ |
-| Kişi bulunamadı | İşleniyor | "Fotoğrafta tam boy bir kişi bulamadık" + *Boy fotoğrafını değiştir* | ⏳ |
-| Ürün tanınamadı | İşleniyor | "Ürünü ayırt edemedik" + *Ürünü değiştir* | ⏳ |
-| Kategori desteklenmiyor | İşleniyor | "Bu ürün türü henüz desteklenmiyor" + *Kombinden çıkar* | ⏳ |
-| Kombinde bir parça başarısız | İşleniyor/Sonuç | Başarılı parçalarla kısmi sonuç + "X giydirilemedi" notu | ⏳ |
-| Zaman aşımı | İşleniyor | "İşlem çok uzun sürdü" + *Tekrar dene* | ⏳ |
-| Oran sınırı (429) | İşleniyor | "Çok fazla deneme yaptın, biraz sonra tekrar dene" | ⏳ |
+| Görsel hazırlanamadı | İşleniyor | "Fotoğraf hazırlanamadı" + *Başka fotoğraf seç* | ✅ (mock) |
+| İnternet yok | İşleniyor | "İnternet bağlantını kontrol et" + *Tekrar dene* | ✅ (mock) |
+| Sunucu hatası | İşleniyor | "Şu an bağlanamıyoruz" + *Tekrar dene* | ✅ (mock) |
+| Kişi bulunamadı | İşleniyor | "Fotoğrafta tam boy bir kişi bulamadık" + *Boy fotoğrafını değiştir* | ✅ (mock) |
+| Ürün tanınamadı | İşleniyor | "Ürünü ayırt edemedik" + *Ürünü değiştir* | ✅ (mock) |
+| Kategori desteklenmiyor | İşleniyor | "Bu ürün türü henüz desteklenmiyor" + *Kombinden çıkar* | ✅ (mock) |
+| Kombinde bir parça başarısız | İşleniyor/Sonuç | Başarılı parçalarla kısmi sonuç + "X giydirilemedi" notu | ✅ (mock) |
+| Zaman aşımı | İşleniyor | "İşlem çok uzun sürdü" + *Tekrar dene* | ✅ (mock) |
+| Oran sınırı (429) | İşleniyor | "Çok fazla deneme yaptın, biraz sonra tekrar dene" | ✅ (mock) |
 | Deneme hakkı bitti | Kombin | Paywall'a yönlendir | ⏳ |
 | Giriş başarısız / iptal | Giriş | "Giriş yapılamadı" + *Tekrar dene* | ⏳ |
 | Satın alma başarısız | Paywall | Mağaza mesajına göre + *Tekrar dene* | ⏳ |
-| Kaydetme izni yok / başarısız | Sonuç | Açıklama + *Ayarları aç* / *Tekrar dene* | ⏳ |
+| Kaydetme izni yok / başarısız | Sonuç | Açıklama + *Ayarları aç* / *Tekrar dene* | ✅ |
 
 ## Kapsam dışı (şimdilik)
 

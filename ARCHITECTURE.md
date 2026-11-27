@@ -1,6 +1,6 @@
 # ARCHITECTURE.md — Teknik Mimari
 
-> Bu dosya "nasıl" sorusunu cevaplar. Ürün davranışı için `SPEC.md`, kurallar ve kararlar için `CLAUDE.md`.
+> Bu dosya "nasıl" sorusunu cevaplar. Ürün davranışı ve kararlar için `SPEC.md`.
 
 ## 1. Genel resim
 
@@ -28,17 +28,45 @@
 - **Bağımlılık yönü yukarıdan aşağıya.** Servisler React'i bilmez (saf TS), bu yüzden birim testi kolaydır.
 - Domain tipleri `src/types/` altındadır. Servisler 3. parti tipleri bu tiplere dönüştürür.
 - Geliştirme boyunca `tryOn` servisi **mock**'tur; Firebase yokken de uçtan uca akış çalışır.
+- **Geçici yol (Adım 14b):** `EXPO_PUBLIC_TRYON_BACKEND=dev-server` iken uygulama Mac'teki `dev-server/server.mjs` ile konuşur
+  (aynı Wi-Fi, `x-dev-key` başlığı). Sunucu Replicate token'ını `.env`'den okur, görselleri Replicate Files API'ye yükler,
+  IDM-VTON'u §2 sırasıyla zincirler, iş bitince dosyaları siler. HTTP: `POST /try-on`, `GET /try-on/:id`, `POST /try-on/:id/cancel`,
+  `GET /health`. Gövdeler §5.1 tipleriyle aynı (görseller base64 JPEG). Zaman aşımı soğuk başlangıç için 5 dk + 1 dk × parça.
 
-### Mevcut dosyalar (Adım 1)
+### Mevcut dosyalar (Adım 1, 5, 6, 8, 9)
 
 | Dosya | Sorumluluk |
 |---|---|
 | `src/services/media/imagePickerService.ts` | İzin kontrol/isteme, kamera/galeri açma, sonucu `PickImageResult`'a çevirme |
-| `src/store/TryOnSessionContext.tsx` | `bodyPhoto` durumu (`setBodyPhoto`, `clearBodyPhoto`, `reset`) |
+| `src/store/TryOnSessionContext.tsx` | `bodyPhoto`, `garments`, `outfit` durumu ve aksiyonları (`addGarment`, `removeGarment`, `setGarmentSlot`, `toggleGarmentInOutfit`, `setRemoveBackground`, `reset`) |
+| `src/store/outfitRules.ts` | Saf kombin kuralları: `applyGarmentToOutfit` (→ `{ outfit, displacedIds }`), `removeGarmentFromOutfit`, `isInOutfit`, `getOutfitGarments`, `createGarmentId` |
+| `src/types/garment.ts` | `GarmentSlot`, `GARMENT_SLOTS` (gösterim sırası), `Garment`, `Outfit`, `MAX_GARMENTS` |
+| `src/components/ui/ImagePickerError.tsx` | Kamera/galeri hata kutusu + `ImagePickerErrorState` (boy ve kombin ekranları ortak) |
+| `src/features/outfit/hooks/useOutfitBuilder.ts` | Picker → yuva seçici → havuz; kombine ekle/çıkar; çıkarılan parçalar için bilgi notu |
+| `src/features/outfit/screens/OutfitScreen.tsx` | Kombin ekranı (bileşenler: `BodyPhotoSummary`, `GarmentCard`, `AddGarmentTile`, `SlotPickerModal`, `OutfitBar`) |
+| `src/services/image/imageProcessor.ts` | `prepareImage` (boyutlandır + JPEG + base64), saf `computeResizeDimensions` |
+| `src/services/tryOn/devServerTryOnService.ts` | GEÇİCİ: `dev-server` HTTP istemcisi |
+| `dev-server/server.mjs` | GEÇİCİ: Replicate köprüsü (bağımlılıksız Node) |
+| `src/services/tryOn/types.ts` | §5.1 sözleşmesi + `TryOnServiceError`, `TryOnProgress`, `TryOnRunResult` |
+| `src/services/tryOn/mockTryOnService.ts` | Mock servis, senaryolar (`configure({ scenario })`) |
+| `src/services/tryOn/runTryOnJob.ts` | §6 yürütücüsü: hazırla → submit (tekrar denemeli) → polling → sonuç/hata/iptal/zaman aşımı |
+| `src/services/tryOn/index.ts` | `tryOnService` (`mock` \| `dev-server`), `isMockTryOn`, `tryOnTimeoutMs` |
+| `src/types/result.ts` | `TryOnOutcome` — oturumdaki son sonuç (görsel, boy fotoğrafı, uygulanan/başarısız parçalar, `isDemo`) |
+| `src/features/try-on/` | `useTryOnJob` (işi başlat/izle/iptal/tekrar), `tryOnCopy.ts` (aşama metinleri, ilerleme, hata eşlemesi), `ProcessingScreen`, `AiPulse`, `ProgressBar` |
+| `src/features/result/screens/ResultScreen.tsx` | Sonuç ekranı (önce/sonra, yakınlaştırma, kısmi sonuç notu, demo rozeti, *Görseli indir*) |
+| `src/features/result/components/WatermarkedImage.tsx`, `BrandWatermark.tsx` | Görsel + sol alt yarı saydam filigran (boyuta orantılı). Ekranda ve dışa aktarmada aynı bileşen |
+| `src/features/result/hooks/useSaveResult.ts` | Ekran dışındaki tam çözünürlüklü logolu kopyayı yakalar → Fotoğraflar'a kaydeder |
+| `src/services/image/viewCaptureService.ts` | `captureViewToJpeg(ref)` — `react-native-view-shot` sarmalayıcısı |
+| `src/services/media/mediaLibraryService.ts` | `saveImageToLibrary(uri)` — yalnızca yazma izni, `expo-media-library/legacy` `saveToLibraryAsync` |
+| `src/features/body-photo/components/ShootingGuide*.tsx` | Ürüne göre kadraj rehberi + "Nasıl çekmeliyim?" penceresi |
+| `src/features/outfit/slotLabels.ts` | Yuvaların Türkçe adları/örnekleri (public API'den dışa açık; İşleniyor ekranı da kullanacak) |
 | `src/features/body-photo/hooks/useBodyPhotoPicker.ts` | Servis sonucunu oturuma yazar, `loadingSource` / `error` üretir |
 | `src/features/body-photo/screens/BodyPhotoScreen.tsx` | Ekran düzeni |
 | `src/config/env.ts` | Herkese açık ortam değerleri: mock seçimi, paywall bayrağı |
-| `src/theme/index.ts` | Marka paleti ve tokenlar |
+| `src/theme/index.ts` | Marka paleti, `fonts`, tip ölçeği, tokenlar (tasarım dili: "kabin aynası") |
+| `src/components/ui/Mirror.tsx` | Kemerli kabin aynası çerçevesi (imza öğe) |
+| `src/components/ui/ScanLine.tsx` | Cyan tarama çizgisi (tek geçiş / döngü, hareketi azalt desteği) |
+| `src/components/ui/StepIndicator.tsx` | Akış adımı çubuğu |
 
 ## 2. Domain modeli (hedef)
 
@@ -56,15 +84,17 @@ type Outfit = Partial<Record<GarmentSlot, string>>;   // yuva → garment id
 
 type TryOnSessionState = {
   bodyPhoto: LocalImage | null;     // ✅ Adım 1
-  garments: Garment[];              // ⏳ Adım 5 (en fazla 10)
-  outfit: Outfit;                   // ⏳ Adım 5
-  activeJob: { jobId: string } | null;            // ⏳ Adım 8
+  garments: Garment[];              // ✅ Adım 5 (en fazla 10)
+  outfit: Outfit;                   // ✅ Adım 5
+  result: TryOnOutcome | null;      // ✅ Adım 9 (aktif iş durumu store'da değil, useTryOnJob içinde)
 };
 ```
 
-**Kombin kuralları** (saf fonksiyon `applyGarmentToOutfit(outfit, garment)`, birim testli):
+**Kombin kuralları** (saf fonksiyon `applyGarmentToOutfit(outfit, garment)` — `src/store/outfitRules.ts`; testleri Adım 2'de):
 - Her yuvada en fazla 1 ürün; aynı yuvaya yeni ürün eskisinin yerine geçer.
 - `dress` seçilince `top` ve `bottom` çıkarılır; `top` veya `bottom` seçilince `dress` çıkarılır.
+- Ürünün kategorisi değişirse eski yuvadan çıkarılıp yeni yuvaya kurallarla yerleştirilir.
+- Yeni eklenen ürün otomatik olarak kombine girer; silinen ürün kombinden de çıkar.
 
 **Giydirme sırası** (backend ve mock aynı sırayı kullanır):
 `bottom` → `dress` → `top` → `outerwear` → `shoes` → `eyewear` → `accessory`.
@@ -74,7 +104,7 @@ type TryOnSessionState = {
 
 Amaç: yükleme süresini ve maliyeti düşürmek, servisin beklediği boyutta kalmak, EXIF/konum verisini atmak.
 
-- Modül: `src/services/image/imageProcessor.ts` (⏳ Adım 4), paket: `expo-image-manipulator`.
+- Modül: `src/services/image/imageProcessor.ts` (✅ Adım 4), paket: `expo-image-manipulator`.
 - Kurallar:
   | Görsel | Uzun kenar (max) | Format | Kalite | Hedef boyut |
   |---|---|---|---|---|
@@ -141,7 +171,7 @@ export type TryOnErrorCode =
 export type TryOnError = { code: TryOnErrorCode; message?: string; retryable: boolean; garmentId?: string };
 ```
 
-`src/services/tryOn/index.ts` → `env.useMockServices` ise `mockTryOnService`, değilse `firebaseTryOnService`.
+`src/services/tryOn/index.ts` → `env.tryOnBackend`e göre `mockTryOnService` | `devServerTryOnService` (geçici) | ileride `firebaseTryOnService`.
 UI sadece `index.ts`'i import eder.
 
 ### 5.2 Replicate IDM-VTON entegrasyonu (backend'de)
@@ -196,22 +226,24 @@ prepare images ─► upload ─► submit ─► poll loop ─► succeeded | f
 - **Genel zaman aşımı:** `60 sn + 45 sn × parça sayısı` (1 parça 105 sn, 3 parça 195 sn); aşılırsa `TIMEOUT` ve best-effort `cancel`.
 - **İptal:** `AbortController`; bekleyen istek kesilir, `cancel(jobId)` çağrılır, sonuç `CANCELLED`.
 - **İlerleme olayları:** `onProgress({ phase: 'preparing' | 'uploading' | 'queued' | 'removing-background' | 'dressing', currentSlot?, step?, totalSteps? })`.
-- **Arka plan:** `AppState` `background` iken polling duraklar, `active` olunca hemen sorgu yapılıp devam eder; zaman aşımı duvar saatiyle ölçülür.
+- **Arka plan:** ⏳ `AppState` `background` iken polling duraklar, `active` olunca hemen sorgu yapılıp devam eder; zaman aşımı duvar saatiyle ölçülür.
+  (Şu an duraklatma yok; JS zamanlayıcıları iOS'ta arka planda zaten durur, dönünce sorgu devam eder.)
 - Başarıda sonuç görseli hemen cihaza indirilir (`localStore`), geçici URL'ye bir daha güvenilmez.
 
 ## 7. Mock (sahte) servis katmanı
 
-Gerçek backend hazır olana kadar tüm akış `mockTryOnService` ile çalışır (`EXPO_PUBLIC_USE_MOCK` varsayılan `true`).
+Gerçek backend hazır olana kadar tüm akış `mockTryOnService` ile çalışır (`EXPO_PUBLIC_TRYON_BACKEND` varsayılan `mock`).
 
 - `TryOnService` arayüzünü birebir uygular; UI hangi servisin çalıştığını bilmez.
-- Davranış: `submit` 300–600 ms gecikme → `queued` (1 sn) → `removing-background` (her ürün ~1 sn) →
-  `dressing` her parça için ~3 sn (`step/totalSteps` ilerler) → `succeeded`.
+- Davranış: `submit` 300–600 ms gecikme → `queued` (1,5 sn) → `removing-background` (arka planı temizlenecek her ürün 2,5 sn) →
+  `dressing` her parça için 5 sn (`step/totalSteps` ilerler) → `succeeded`. Süreler polling aralığında (2–5 sn) aşamalar
+  görünsün diye seçildi; durum gönderimden bu yana geçen duvar saatinden hesaplanır. `slow` senaryosu 3 kat yavaştır.
 - Sonuç görseli: şimdilik **boy fotoğrafının kendisi** (ileride ürün küçük resimlerini üstüne bindiren basit kompozisyon).
   Amaç akışı test etmek, kaliteyi değil. Upload adımı mock'ta atlanır (yerel URI'ler kullanılır).
 - Tüm yuvaları destekler (gerçek backend'in aksine, bkz. §5.2).
 - **Senaryolar:** `mockTryOnService.configure({ scenario })`
   `'success' | 'slow' | 'timeout' | 'invalid-body' | 'invalid-garment' | 'partial' | 'network-flaky' | 'rate-limited' | 'no-credits'`.
-- Mock yalnızca `__DEV__` veya `EXPO_PUBLIC_USE_MOCK=true` iken seçilebilir; üretim derlemesinde `firebase` zorunludur.
+- Mock yalnızca `__DEV__` veya `EXPO_PUBLIC_TRYON_BACKEND=mock` iken seçilebilir; üretim derlemesinde `firebase` zorunludur.
 
 ## 8. Hak (deneme) ve ödeme
 
@@ -246,13 +278,16 @@ Gerçek backend hazır olana kadar tüm akış `mockTryOnService` ile çalışı
 
 | Değişken | Örnek | Not |
 |---|---|---|
-| `EXPO_PUBLIC_USE_MOCK` | `true` | `false` olunca Firebase servisi kullanılır |
+| `EXPO_PUBLIC_TRYON_BACKEND` | `mock` | `mock` \| `dev-server` (ileride `firebase`) |
+| `EXPO_PUBLIC_DEV_SERVER_URL` | `http://192.168.1.10:8787` | Mac'in yerel IP'si; yalnızca `dev-server` |
+| `EXPO_PUBLIC_DEV_SERVER_KEY` | (rastgele) | Gizli değil; LAN'daki başka cihazları engellemek için, `dev-server/.env` ile aynı |
 | `EXPO_PUBLIC_PAYWALL_ENABLED` | `false` | Geliştirmede kapalı |
 | `EXPO_PUBLIC_FIREBASE_*` | (Adım 14) | Firebase istemci yapılandırması — gizli değildir |
-| `EXPO_PUBLIC_API_BASE_URL` | — | Firebase'e geçince kaldırılacak |
+
+`dev-server/.env` (git'e girmez): `REPLICATE_API_TOKEN`, `DEV_SERVER_KEY`, `PORT`, isteğe bağlı `IDM_VTON_VERSION`.
 
 Backend (Functions): `REPLICATE_API_TOKEN` (Secret Manager), `REPLICATE_WEBHOOK_SECRET` (Secret Manager), `PAYWALL_ENABLED`.
-Gizli anahtar **mobilde yoktur ve olmayacaktır** (bkz. `CLAUDE.md` §5).
+Gizli anahtar **mobilde yoktur ve olmayacaktır**.
 
 ## 12. Test stratejisi
 
