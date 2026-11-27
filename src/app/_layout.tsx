@@ -21,7 +21,7 @@ export default function RootLayout() {
         >
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="capture/body" options={{ title: 'Boy fotoğrafı' }} />
-          <Stack.Screen name="capture/garment" options={{ title: 'Ürün seç' }} />
+          <Stack.Screen name="capture/garment" options={{ title: 'Kombin' }} />
           <Stack.Screen
             name="processing"
             options={{ title: 'Hazırlanıyor', headerBackVisible: false, gestureEnabled: false }}

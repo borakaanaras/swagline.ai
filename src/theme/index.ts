@@ -19,6 +19,12 @@ export const colors = {
   /** AI etkileşimi vurgusu (işleniyor, AI rozetleri) — Cyber Cyan */
   accent: '#22D3EE',
   accentText: '#0F0F12',
+  /** accent'in saydam zemini (AI rozetleri, bilgi notları) */
+  accentSurface: 'rgba(34, 211, 238, 0.12)',
+  /** primary'nin saydam zemini (seçili öğeler) */
+  primarySurface: 'rgba(99, 102, 241, 0.16)',
+  /** Modal arkasındaki karartma */
+  overlay: 'rgba(0, 0, 0, 0.6)',
   danger: '#F87171',
   dangerSurface: 'rgba(248, 113, 113, 0.12)',
 } as const;

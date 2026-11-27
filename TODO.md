@@ -31,11 +31,12 @@ Faz B (Adım 12–17): Development build, Firebase, gerçek AI, giriş, ödeme.
 - `expo-image-manipulator` (gerekçeli). `computeResizeDimensions` (testli) + `prepareImage(image, 'body' | 'garment')`.
 - **Nasıl test edilir:** Birim testleri; büyük fotoğrafta sonucun ≤ 1536 px / ≤ 1.5 MB olduğunu geçici logdan doğrula.
 
-### [ ] Adım 5 — Kombin ekranı (ürün havuzu + yuvalar)
+### [x] Adım 5 — Kombin ekranı (ürün havuzu + yuvalar)
 - Oturuma `garments` + `outfit`; saf `applyGarmentToOutfit` (dress ↔ top/bottom kuralı, testli).
 - Ürün ekle (galeri/kamera) → yuva seçici → havuz ızgarası (en fazla 10), sil, kombine ekle/çıkar,
   "Arka plan temizlenecek" rozeti + *Orijinali kullan*, kombin çubuğu, *Üzerimde dene* → yer tutucu `/processing`.
 - **Nasıl test edilir:** Üst + alt seç, sonra elbise seç → üst/alt çıkar; ayakkabı + gözlük ekle; boy fotoğrafını değiştirip dön, havuz korunur.
+- **Not:** `applyGarmentToOutfit` için birim testi Adım 2 (Jest) kurulunca yazılacak; şimdilik elle doğrulandı.
 
 ### [ ] Adım 6 — Try-on sözleşmesi + mock servis + iş yürütücü
 - `services/tryOn/types.ts` (çoklu parça, aşamalar), `mockTryOnService` (senaryolar), `runTryOnJob` (polling/timeout/iptal).

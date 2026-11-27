@@ -45,7 +45,7 @@ Karşılama ─► (Giriş: Apple / Google) ─► (1) Boy fotoğrafı ─► (2
 - ⏳ **Doğrulama (Adım 3):** Yatay veya kısa kenarı 512 px'ten küçükse engellemeyen uyarı.
 - ⏳ İleride: canlı kamera üzerinde kadraj overlay'i.
 
-## (2) Kombin oluşturma — ürün fotoğrafı seçme ⏳ (`/capture/garment`, Adım 5) — şu an yer tutucu
+## (2) Kombin oluşturma — ürün fotoğrafı seçme ✅ (`/capture/garment`, Adım 5)
 
 **Ürün yuvaları (kategori):**
 
@@ -64,11 +64,16 @@ Karşılama ─► (Giriş: Apple / Google) ─► (1) Boy fotoğrafı ─► (2
 - *Ürün ekle*: galeriden seç veya kamerayla çek. Eklenince:
   1. Arka plan **otomatik temizlenecek** şekilde işaretlenir (temizleme deneme sırasında sunucuda yapılır, bkz. ARCHITECTURE §4).
      Kartta "Arka plan temizlenecek" rozeti; kullanıcı isterse *Orijinali kullan* ile kapatır.
-  2. Kategori sorulur (yuva seçici). İleride otomatik tahmin, kullanıcı düzeltebilir.
+  2. Kategori sorulur (alt sayfada yuva seçici; *Vazgeç* ile ürün eklenmez). İleride otomatik tahmin, kullanıcı düzeltebilir.
+  3. Ürün havuza eklenir ve **doğrudan kombine de girer** (kurallar uygulanır); istemezse karta dokunup çıkarır.
 - **Ürün havuzu:** ızgara; her kart küçük resim, kategori etiketi, sil (×). En fazla 10 ürün.
 - **Kombin çubuğu (alt):** seçili ürünler yuva sırasıyla. Bir karta dokunmak onu kombine ekler/çıkarır.
   Aynı yuvada başka ürün seçilirse eskisinin yerine geçer; `dress` seçilince `top`/`bottom` çıkar (kısa bilgi notu).
-- *Üzerimde dene* (en az 1 ürün seçiliyse aktif) → hak kontrolü → İşleniyor.
+- Kural bir ürünü çıkardığında veya aynı yuvadaki ürünün yerine geçtiğinde kapatılabilir bir bilgi notu çıkar
+  (ör. "Üst ve alt, elbise / tulum ile birlikte seçilemez; kombinden çıkarıldı.").
+- Havuz 10 ürüne ulaşınca ekleme butonları kapanır, "birini sil" notu gösterilir.
+- *Üzerimde dene* (en az 1 ürün seçiliyse ve boy fotoğrafı varsa aktif; 2+ parçada "(n parça)") → hak kontrolü → İşleniyor.
+  Şimdilik yer tutucu `/processing`'e gider (Adım 6–8).
 - Ürün fotoğrafı ipuçları: ürün tek başına, tamamı görünür, net; askıda veya düz zeminde.
 
 ## Hak kontrolü ve Paywall ⏳ (Adım 17)
@@ -112,9 +117,9 @@ Her hata **kullanıcı dostu Türkçe mesaj + net bir sonraki aksiyon** içerir.
 
 | Durum | Nerede | Mesaj / Aksiyon | Durum |
 |---|---|---|---|
-| Kamera/galeri izni reddedildi | Boy, Kombin | Açıklama + *Tekrar dene* | ✅ (Boy) |
-| İzin kalıcı reddedildi | Boy, Kombin | *Ayarları aç* | ✅ (Boy) |
-| Picker hatası | Boy, Kombin | "Fotoğraf alınırken bir sorun oluştu" + *Tekrar dene* | ✅ (Boy) |
+| Kamera/galeri izni reddedildi | Boy, Kombin | Açıklama + *Tekrar dene* | ✅ |
+| İzin kalıcı reddedildi | Boy, Kombin | *Ayarları aç* | ✅ |
+| Picker hatası | Boy, Kombin | "Fotoğraf alınırken bir sorun oluştu" + *Tekrar dene* | ✅ |
 | Uygun olmayan boy fotoğrafı | Boy | Uyarı, engellemez | ⏳ |
 | Arka plan temizlenemedi | Kombin / İşleniyor | "Ürünün arka planını ayıramadık" + *Orijinali kullan* / *Başka fotoğraf* | ⏳ |
 | Görsel hazırlanamadı | İşleniyor | "Fotoğraf hazırlanamadı" + *Başka fotoğraf seç* | ⏳ |
